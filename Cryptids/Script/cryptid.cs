@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class  Sunspot : MonoBehaviour
+public class cryptid : MonoBehaviour
 {
-    private void Start()
+    public int scoreCheck;
+    // Start is called before the first frame update
+    void Start()
     {
         
     }

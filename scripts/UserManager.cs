@@ -58,4 +58,9 @@ public class UserManager : MonoBehaviour
 
         Camera.main.targetTexture = pre;
     }
+
+    public int getScore()
+    {
+        return score;
+    }    
 }
