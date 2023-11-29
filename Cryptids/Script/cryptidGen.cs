@@ -11,11 +11,19 @@ public class cryptidGen : MonoBehaviour
     public UserManager UserManager;
 
     public List<GameObject> list = new List<GameObject>();
-
-    [SerializeField]
+    public List<GameObject> upgradeKey = new List<GameObject>();
+    public List<GameObject> upgradeItem = new List<GameObject>();
+ 
     private Dictionary<GameObject, GameObject> upgrades = new Dictionary<GameObject, GameObject>();
-   
     private bool created = false;
+
+    private void Start()
+    {
+        for(int i = 0; i < upgradeKey.Count; i++)
+        {
+            upgrades[upgradeKey[i]] = upgradeItem[i];
+        }
+    }
 
     private void Update()
     {
