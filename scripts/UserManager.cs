@@ -8,6 +8,8 @@ using System.Net.Sockets;
 
 public class UserManager : MonoBehaviour
 {
+    public cryptidGen cryptidGen;
+
     // score functionality
     private int score;
 
@@ -57,6 +59,7 @@ public class UserManager : MonoBehaviour
         Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(screenshot, Application.productName + " Captures", imgName));
 
         Camera.main.targetTexture = pre;
+        cryptidGen.createCryptid();
     }
 
     public int getScore()

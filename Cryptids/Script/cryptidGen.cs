@@ -9,13 +9,15 @@ using UnityEngine.UIElements;
 public class cryptidGen : MonoBehaviour
 {
     public UserManager UserManager;
+    public int randomChance;
 
     public List<GameObject> list = new List<GameObject>();
     public List<GameObject> upgradeKey = new List<GameObject>();
     public List<GameObject> upgradeItem = new List<GameObject>();
  
     private Dictionary<GameObject, GameObject> upgrades = new Dictionary<GameObject, GameObject>();
-    private bool created = false;
+    private GameObject currentCryptid = null;
+
 
     private void Start()
     {
@@ -23,29 +25,38 @@ public class cryptidGen : MonoBehaviour
         {
             upgrades[upgradeKey[i]] = upgradeItem[i];
         }
+
+        createCryptid();
     }
 
-    private void Update()
+    public void createCryptid()
     {
-        if(!created)
+        Debug.Log("test");
+        if (currentCryptid)
         {
-            int i = UnityEngine.Random.Range(0, list.Count);
-            GameObject cryptid = list[i];
+            GameObject.Destroy(currentCryptid);
+        }
 
-            while(cryptid.GetComponent<cryptid>().scoreCheck <  UserManager.getScore())
+        int i = UnityEngine.Random.Range(0, list.Count);
+        GameObject cryptid = list[i];
+
+        while (cryptid.GetComponent<cryptid>().scoreCheck < UserManager.getScore())
+        {
+            if (upgrades.ContainsKey(cryptid))
             {
-                if (upgrades.ContainsKey(cryptid))
+                int upgradeRandom = UnityEngine.Random.Range(0, 100);
+
+                if (upgradeRandom > randomChance)
                 {
                     cryptid = upgrades[cryptid];
                 }
-                else
-                {
-                    break;
-                }
             }
-
-            Instantiate(cryptid,transform);
-            created = true;
+            else
+            {
+                break;
+            }
         }
-    }
+
+        currentCryptid = Instantiate(cryptid, transform);
+    }    
 }
