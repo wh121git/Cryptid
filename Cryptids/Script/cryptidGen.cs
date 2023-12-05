@@ -11,6 +11,9 @@ public class cryptidGen : MonoBehaviour
     public UserManager UserManager;
     public int randomChance;
 
+    public Transform BL;
+    public Transform TR;
+
     public List<GameObject> list = new List<GameObject>();
     public List<GameObject> upgradeKey = new List<GameObject>();
     public List<GameObject> upgradeItem = new List<GameObject>();
@@ -31,7 +34,6 @@ public class cryptidGen : MonoBehaviour
 
     public void createCryptid()
     {
-        Debug.Log("test");
         if (currentCryptid)
         {
             GameObject.Destroy(currentCryptid);
@@ -56,6 +58,8 @@ public class cryptidGen : MonoBehaviour
                 break;
             }
         }
+
+        cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
 
         currentCryptid = Instantiate(cryptid, transform);
     }    
