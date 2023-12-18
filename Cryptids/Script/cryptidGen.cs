@@ -5,7 +5,15 @@ using UnityEngine;
 using SerializableDictionary.Scripts;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UIElements;
+using UnityEngine.XR;
+using UnityEngine.XR.ARFoundation;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
+/*
+ * Code sources:
+ * [1] Basic save and load functionality: https://gamedev.stackexchange.com/questions/115863/how-to-save-variables-into-a-file-unity
+ */
 public class cryptidGen : MonoBehaviour
 {
     public UserManager UserManager;
@@ -13,6 +21,7 @@ public class cryptidGen : MonoBehaviour
 
     public Transform BL;
     public Transform TR;
+    public ARPlaneManager planeManager;
 
     public List<GameObject> list = new List<GameObject>();
     public List<GameObject> upgradeKey = new List<GameObject>();
@@ -21,6 +30,47 @@ public class cryptidGen : MonoBehaviour
     private Dictionary<GameObject, GameObject> upgrades = new Dictionary<GameObject, GameObject>();
     private GameObject currentCryptid = null;
 
+    //[1]
+    [Serializable]
+    public class SaveFile
+    {
+        // Time since last open
+        private DateTime time;
+        // In game score
+        private int saveScore;
+
+
+        // Gets and sets
+        public DateTime getTime(){ return time;}
+        public void setTime(DateTime newTime) {  time = newTime; }
+
+        public int getSaveScore() { return saveScore;}
+        public void setSaveScore(int newSaveScore) { saveScore = newSaveScore; }
+    }
+
+    public void Save(SaveFile saveFile)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/save.dat");
+        bf.Serialize(file, saveFile);
+    }
+
+    public SaveFile Load()
+    {
+        if(File.Exists(Application.persistentDataPath + "/save.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/save.dat", FileMode.Open);
+            SaveFile saveFile = (SaveFile)bf.Deserialize(file);
+            file.Close();
+            return saveFile;
+        }
+        else
+        {
+            Debug.Log("No File");
+            return null;
+        }
+    }
 
     private void Start()
     {
@@ -59,8 +109,22 @@ public class cryptidGen : MonoBehaviour
             }
         }
 
-        cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
+        if (!cryptid.GetComponent<cryptid>().floor)
+        {
+            cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
 
-        currentCryptid = Instantiate(cryptid, transform);
+            currentCryptid = Instantiate(cryptid, transform);
+        }
+        else
+        {
+            Vector3 floor = transform.position;
+            foreach (var plane in planeManager.trackables)
+            {
+                floor = plane.transform.position;
+            }
+
+            cryptid.transform.position = floor;
+            currentCryptid = Instantiate(cryptid, transform);
+        }
     }    
 }

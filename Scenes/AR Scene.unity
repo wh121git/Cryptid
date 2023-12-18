@@ -389,9 +389,11 @@ MonoBehaviour:
   randomChance: 40
   BL: {fileID: 799233785}
   TR: {fileID: 1685071427}
+  planeManager: {fileID: 223974229}
   list:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 9403ec37253316f4bba423fb9cfa96ed, type: 3}
+  - {fileID: 867760034644781879, guid: e6e6b5e8498d22544ad093f701f5482a, type: 3}
   upgradeKey:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   upgradeItem:
@@ -1040,6 +1042,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AR Default Plane
       objectReference: {fileID: 0}
+    - target: {fileID: 68649079120392083, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2171651904167077798, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -1083,6 +1089,30 @@ PrefabInstance:
     - target: {fileID: 2171651904167077798, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6725012503051304755, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.r
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b084abb50b8ad7642a8421cfa27e608b, type: 3}
