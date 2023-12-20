@@ -10,14 +10,12 @@ using UnityEngine.XR.ARFoundation;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-/*
- * Code sources:
- * [1] Basic save and load functionality: https://gamedev.stackexchange.com/questions/115863/how-to-save-variables-into-a-file-unity
- */
+
 public class cryptidGen : MonoBehaviour
 {
     public UserManager UserManager;
     public int randomChance;
+    public bool exists;
 
     public Transform BL;
     public Transform TR;
@@ -30,56 +28,12 @@ public class cryptidGen : MonoBehaviour
     private Dictionary<GameObject, GameObject> upgrades = new Dictionary<GameObject, GameObject>();
     private GameObject currentCryptid = null;
 
-    //[1]
-    [Serializable]
-    public class SaveFile
-    {
-        // Time since last open
-        private DateTime time;
-        // In game score
-        private int saveScore;
-
-
-        // Gets and sets
-        public DateTime getTime(){ return time;}
-        public void setTime(DateTime newTime) {  time = newTime; }
-
-        public int getSaveScore() { return saveScore;}
-        public void setSaveScore(int newSaveScore) { saveScore = newSaveScore; }
-    }
-
-    public void Save(SaveFile saveFile)
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/save.dat");
-        bf.Serialize(file, saveFile);
-    }
-
-    public SaveFile Load()
-    {
-        if(File.Exists(Application.persistentDataPath + "/save.dat"))
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/save.dat", FileMode.Open);
-            SaveFile saveFile = (SaveFile)bf.Deserialize(file);
-            file.Close();
-            return saveFile;
-        }
-        else
-        {
-            Debug.Log("No File");
-            return null;
-        }
-    }
-
     private void Start()
     {
         for(int i = 0; i < upgradeKey.Count; i++)
         {
             upgrades[upgradeKey[i]] = upgradeItem[i];
         }
-
-        createCryptid();
     }
 
     public void createCryptid()
@@ -126,5 +80,13 @@ public class cryptidGen : MonoBehaviour
             cryptid.transform.position = floor;
             currentCryptid = Instantiate(cryptid, transform);
         }
-    }    
+
+        exists = true;
+    }  
+    
+    public void DeleteCryptid()
+    {
+        GameObject.Destroy(currentCryptid);
+        exists = false;
+    }
 }
