@@ -12,7 +12,9 @@ using System;
  * Code sources:
  * [1] Basic save and load functionality: https://gamedev.stackexchange.com/questions/115863/how-to-save-variables-into-a-file-unity
  * [2] Android save function using JSON:  https://stackoverflow.com/questions/52491198/how-to-save-manage-game-progress-in-mobile-devices-unity
- *[3] Date time string converting: https://stackoverflow.com/questions/10798980/convert-c-sharp-date-time-to-string-and-back
+ * [3] Date time string converting: https://stackoverflow.com/questions/10798980/convert-c-sharp-date-time-to-string-and-back
+ * [4] Unity Android Gallery support: https://assetstore.unity.com/packages/tools/integration/native-gallery-for-android-ios-112630
+ * [5] Gain image from Gallery at yasirkula, Apr 25, 2018: https://forum.unity.com/threads/native-gallery-for-android-ios-open-source.519619/
  */
 public class UserManager : MonoBehaviour
 {
@@ -86,10 +88,17 @@ public class UserManager : MonoBehaviour
 
 
     // picture functionality
-    public void takePicture()
+    public void capture()
     {
-        // allow co-routine to ensure end of frame
-        StartCoroutine(takePictureEn());
+        if (cryptidGen.exists)
+        {
+            // allow co-routine to ensure end of frame
+            StartCoroutine(takePictureEn());
+        }
+        else
+        {
+            StartCoroutine(GetPictureEn());
+        }
     }
 
     private IEnumerator takePictureEn()
@@ -112,7 +121,10 @@ public class UserManager : MonoBehaviour
             screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
             screenshot.Apply();
 
-            string imgName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "{0}", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            // saves image as: Cryptid_Capture_[name of cryptid](Clone)_[date].png
+            string imgName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "_" + cryptidGen.getCurrentCryptidName(), System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            
+            //[4]
             Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(screenshot, Application.productName + " Captures", imgName));
 
             Camera.main.targetTexture = pre;
@@ -120,5 +132,35 @@ public class UserManager : MonoBehaviour
             increaseScore(1);
             mobileNotifications.sendNotif();
         }
+    }
+
+    private IEnumerator GetPictureEn()
+    {
+        // end frame 
+        yield return new WaitForEndOfFrame();
+
+        //[5]
+        NativeGallery.GetImageFromGallery((path) =>
+        {
+            if (path != null)
+            {
+                // Create Texture from selected image
+                var pathArray = path.Split('/');
+                string output = "";
+
+                foreach (string seg in pathArray)
+                {
+                    output = seg;
+                }
+
+                output = output.Substring(16, output.Length - 47);
+                
+                cryptidGen.createSpecificCryptid(output);
+                File.Delete(path);
+            }
+        });
+
+        
+
     }
 }

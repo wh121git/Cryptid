@@ -2,31 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.UI;
 
-public class cryptid : MonoBehaviour
+public class AndroidGPS : MonoBehaviour
 {
-    public int scoreCheck;
-    public bool floor;
-    private (float, float) location;
+    public GameObject text;
 
-    public void setLocationFromCurrent()
+    public void getLocation()
     {
         StartCoroutine(Location());
-    }
-
-    public void setLocation(float x, float y)
-    {
-        location = (x, y);
-    }
-
-    public (float,float) getLocation()
-    {
-        return location;
-    }
-
+    }    
     private IEnumerator Location()
     {
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        if(!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
             Permission.RequestUserPermission(Permission.CoarseLocation);
@@ -34,7 +22,7 @@ public class cryptid : MonoBehaviour
 
         // Check if the user has location service enabled.
         if (!Input.location.isEnabledByUser)
-            Debug.Log("Location not enabled on device or app does not have permission to access location");
+            text.GetComponent<Text>().text = "Location not enabled on device or app does not have permission to access location";
 
         // Starts the location service.
         Input.location.Start();
@@ -51,6 +39,7 @@ public class cryptid : MonoBehaviour
         if (maxWait < 1)
         {
             Debug.Log("Timed out");
+            text.GetComponent<Text>().text = "Timed Out";
             yield break;
         }
 
@@ -58,13 +47,13 @@ public class cryptid : MonoBehaviour
         if (Input.location.status == LocationServiceStatus.Failed)
         {
             Debug.LogError("Unable to determine device location");
+            text.GetComponent<Text>().text = "Unable to determine device location";
             yield break;
         }
         else
         {
             // If the connection succeeded, this retrieves the device's current location and displays it in the Console window.
-            location.Item1 = Input.location.lastData.latitude;
-            location.Item2 = Input.location.lastData.longitude;
+            text.GetComponent<Text>().text = "Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp;
         }
 
         // Stops the location service if there is no need to query location updates continuously.

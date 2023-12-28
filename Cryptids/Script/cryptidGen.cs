@@ -14,6 +14,7 @@ using System.IO;
 public class cryptidGen : MonoBehaviour
 {
     public UserManager UserManager;
+    public serverRep serverRep;
     public int randomChance;
     public bool exists;
 
@@ -63,6 +64,8 @@ public class cryptidGen : MonoBehaviour
             }
         }
 
+        cryptid.GetComponent<cryptid>().setLocationFromCurrent();
+
         if (!cryptid.GetComponent<cryptid>().floor)
         {
             cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
@@ -82,11 +85,54 @@ public class cryptidGen : MonoBehaviour
         }
 
         exists = true;
-    }  
+
+
+    }
+
+    public void createSpecificCryptid(string name)
+    {
+        GameObject cryptid = null;
+
+        foreach(GameObject nextCryptid in list)
+        {
+            if(nextCryptid.name == name)
+            {
+                cryptid = nextCryptid;
+                break;
+            }
+        }
+
+
+        if (!cryptid.GetComponent<cryptid>().floor)
+        {
+            cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
+
+            currentCryptid = Instantiate(cryptid, transform);
+        }
+        else
+        {
+            Vector3 floor = transform.position;
+            foreach (var plane in planeManager.trackables)
+            {
+                floor = plane.transform.position;
+            }
+
+            cryptid.transform.position = floor;
+            currentCryptid = Instantiate(cryptid, transform);
+        }
+
+        serverRep.addCryptid(cryptid);
+        exists = true;
+    }
     
     public void DeleteCryptid()
     {
         GameObject.Destroy(currentCryptid);
         exists = false;
     }
+
+    public string getCurrentCryptidName()
+    {
+        return currentCryptid.name;
+    }    
 }
