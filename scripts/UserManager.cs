@@ -6,7 +6,9 @@ using NativeGalleryNamespace;
 using UnityEngine.SceneManagement;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine.Android;
 using System;
+using static UnityEditor.FilePathAttribute;
 
 /*
  * Code sources:
@@ -21,9 +23,11 @@ public class UserManager : MonoBehaviour
     // get cryptid class
     public cryptidGen cryptidGen;
     public MobileNotifications mobileNotifications;
+    public serverRep serverRep;
 
     // score functionality
     private int score;
+    private (float, float) userLocation;
 
     // make permenant through reloads
     private void Awake()
@@ -41,9 +45,18 @@ public class UserManager : MonoBehaviour
 
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
-        if(then.AddHours(1) <  now )
+        GetPlayerLocation();
+
+        if (serverRep.findCryptid(userLocation) != null)
         {
-            cryptidGen.createCryptid();
+            cryptidGen.createSpecificCryptid(serverRep.findCryptid(userLocation).name);
+        }
+        else
+        {
+            if (then.AddHours(1) < now)
+            {
+                cryptidGen.createCryptid();
+            }
         }
   
 
@@ -162,5 +175,59 @@ public class UserManager : MonoBehaviour
 
         
 
+    }
+
+    public void GetPlayerLocation()
+    {
+        StartCoroutine(Location());
+    }
+
+    private IEnumerator Location()
+    {
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        {
+            Permission.RequestUserPermission(Permission.FineLocation);
+            Permission.RequestUserPermission(Permission.CoarseLocation);
+        }
+
+        // Check if the user has location service enabled.
+        if (!Input.location.isEnabledByUser)
+            Debug.Log("Location not enabled on device or app does not have permission to access location");
+
+        // Starts the location service.
+        Input.location.Start();
+
+        // Waits until the location service initializes
+        int maxWait = 20;
+        while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+        {
+            yield return new WaitForSeconds(1);
+            maxWait--;
+        }
+
+        // If the service didn't initialize in 20 seconds this cancels location service use.
+        if (maxWait < 1)
+        {
+            Debug.Log("Timed out");
+            yield break;
+        }
+
+        // If the connection failed this cancels location service use.
+        if (Input.location.status == LocationServiceStatus.Failed)
+        {
+            Debug.LogError("Unable to determine device location");
+            yield break;
+        }
+        else
+        {
+            // If the connection succeeded, this retrieves the device's current location and displays it in the Console window.
+            userLocation.Item1 = Input.location.lastData.latitude;
+            userLocation.Item1 = (float)Math.Ceiling(userLocation.Item1 * 100f) / 100f;
+            userLocation.Item2 = Input.location.lastData.longitude;
+            userLocation.Item2 = (float)Math.Ceiling(userLocation.Item2 * 100f) / 100f;
+        }
+
+        // Stops the location service if there is no need to query location updates continuously.
+        Input.location.Stop();
     }
 }

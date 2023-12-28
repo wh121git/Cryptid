@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -64,7 +65,9 @@ public class cryptid : MonoBehaviour
         {
             // If the connection succeeded, this retrieves the device's current location and displays it in the Console window.
             location.Item1 = Input.location.lastData.latitude;
+            location.Item1 = (float)Math.Ceiling(location.Item1 * 100f) / 100f;
             location.Item2 = Input.location.lastData.longitude;
+            location.Item2 = (float)Math.Ceiling(location.Item2 * 100f) / 100f;
         }
 
         // Stops the location service if there is no need to query location updates continuously.

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class serverRep : MonoBehaviour
@@ -58,5 +59,18 @@ public class serverRep : MonoBehaviour
     {
         cryptids.Add(cryptid);
         locations.Add(cryptid.GetComponent<cryptid>().getLocation());
-    }    
+    }
+
+    public GameObject findCryptid((float, float) location)
+    {
+        foreach(GameObject cryptid in cryptids)
+        {
+            if(cryptid.GetComponent<cryptid>().getLocation() == location)
+            {
+                return cryptid;
+            }
+        }
+
+        return null;
+    }
 }
