@@ -8,7 +8,6 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Android;
 using System;
-using static UnityEditor.FilePathAttribute;
 
 /*
  * Code sources:
@@ -43,14 +42,18 @@ public class UserManager : MonoBehaviour
 
         DateTime now = DateTime.Now;
 
+        // check that an hour has passed
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
         GetPlayerLocation();
 
+        // check if there is a cryptid at this location
         if (serverRep.findCryptid(userLocation) != null)
         {
             cryptidGen.createSpecificCryptid(serverRep.findCryptid(userLocation).name);
+            cryptidGen.createExistingCryptid(serverRep.findCryptid(userLocation));
         }
+        // otherwise randomly generate after an hour
         else
         {
             if (then.AddHours(1) < now)
@@ -69,6 +72,7 @@ public class UserManager : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
+        // save data for check later
         PlayerPrefs.SetInt("score", score);
 
         DateTime now = DateTime.Now;
@@ -107,6 +111,7 @@ public class UserManager : MonoBehaviour
         {
             // allow co-routine to ensure end of frame
             StartCoroutine(takePictureEn());
+            serverRep.removeCryptid(userLocation);
         }
         else
         {
@@ -166,9 +171,12 @@ public class UserManager : MonoBehaviour
                     output = seg;
                 }
 
+                // get cryptid name specifically
                 output = output.Substring(16, output.Length - 47);
                 
                 cryptidGen.createSpecificCryptid(output);
+
+                // delete image
                 File.Delete(path);
             }
         });
@@ -184,13 +192,14 @@ public class UserManager : MonoBehaviour
 
     private IEnumerator Location()
     {
+        // permissions from the user
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
             Permission.RequestUserPermission(Permission.CoarseLocation);
         }
 
-        // Check if the user has location service enabled.
+        // Check permissions
         if (!Input.location.isEnabledByUser)
             Debug.Log("Location not enabled on device or app does not have permission to access location");
 
@@ -220,7 +229,7 @@ public class UserManager : MonoBehaviour
         }
         else
         {
-            // If the connection succeeded, this retrieves the device's current location and displays it in the Console window.
+            // If the connection succeeded, this retrieves the device's current location, returning a rounded version to the user location variables
             userLocation.Item1 = Input.location.lastData.latitude;
             userLocation.Item1 = (float)Math.Ceiling(userLocation.Item1 * 100f) / 100f;
             userLocation.Item2 = Input.location.lastData.longitude;

@@ -1,13 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.Rendering;
 
 public class cryptid : MonoBehaviour
 {
-    public int scoreCheck;
+    public int powerCap;
     public bool floor;
+
+    private int power = 0;
     private (float, float) location;
 
     public void setLocationFromCurrent()
@@ -72,5 +76,25 @@ public class cryptid : MonoBehaviour
 
         // Stops the location service if there is no need to query location updates continuously.
         Input.location.Stop();
+    }
+
+    public void increasePower()
+    {
+        power++;
+    }
+
+    public void setPower(int newPower)
+    {
+        power = newPower;
+    }
+
+    public bool checkPower()
+    {
+        return power > powerCap;
+    }
+
+    public int getPower()
+    {
+        return power;
     }
 }

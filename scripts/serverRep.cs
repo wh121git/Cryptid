@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class serverRep : MonoBehaviour
@@ -24,6 +23,7 @@ public class serverRep : MonoBehaviour
         {
             setObjects();
             saveLoc();
+            savePower();
         }
 
     }
@@ -37,21 +37,29 @@ public class serverRep : MonoBehaviour
         for(int i = 0; i < cryptids.Count; i++)
         {
             cryptids[i].GetComponent<cryptid>().setLocation(locations[i].Item1, locations[i].Item2);
+            cryptids[i].GetComponent<cryptid>().setPower(PlayerPrefs.GetInt("pow" + i));
         }
     }
 
     public void saveLoc()
     {
-        if(PlayerPrefs.GetFloat("loc0x",0f) == 0f)
-        {
-            int i = 0;
+        int i = 0;
 
-            foreach ((float, float) loc in locations)
-            {
-                PlayerPrefs.SetFloat("loc" + i + "x", loc.Item1);
-                PlayerPrefs.SetFloat("loc" + i + "y", loc.Item2);
-                i++;
-            }
+        foreach ((float, float) loc in locations)
+        {
+            PlayerPrefs.SetFloat("loc" + i + "x", loc.Item1);
+            PlayerPrefs.SetFloat("loc" + i + "y", loc.Item2);
+            i++;
+        }
+    }
+
+    public void savePower()
+    {
+        int i = 0;
+
+        foreach(GameObject cryptid in cryptids)
+        {
+            PlayerPrefs.SetInt("pow" + i, cryptid.GetComponent<cryptid>().getPower());
         }
     }
 
@@ -59,6 +67,9 @@ public class serverRep : MonoBehaviour
     {
         cryptids.Add(cryptid);
         locations.Add(cryptid.GetComponent<cryptid>().getLocation());
+
+        saveLoc();
+        savePower();
     }
 
     public GameObject findCryptid((float, float) location)
@@ -72,5 +83,21 @@ public class serverRep : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void removeCryptid((float,float) location)
+    {
+        for(int i = 0; i < cryptids.Count; i++)
+        {
+            if (locations[i] == location)
+            {
+                cryptids.RemoveAt(i);
+                locations.RemoveAt(i);
+
+                saveLoc();
+                savePower();
+                break;
+            }
+        }
     }
 }

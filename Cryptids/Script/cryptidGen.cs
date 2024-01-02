@@ -39,15 +39,18 @@ public class cryptidGen : MonoBehaviour
 
     public void createCryptid()
     {
+        // delete current cryptid
         if (currentCryptid)
         {
             GameObject.Destroy(currentCryptid);
         }
 
+        // randomly generate new cryptid
         int i = UnityEngine.Random.Range(0, list.Count);
         GameObject cryptid = list[i];
 
-        while (cryptid.GetComponent<cryptid>().scoreCheck < UserManager.getScore())
+        // upgrade cryptid
+        while (cryptid.GetComponent<cryptid>().checkPower())
         {
             if (upgrades.ContainsKey(cryptid))
             {
@@ -64,14 +67,17 @@ public class cryptidGen : MonoBehaviour
             }
         }
 
+        // set location to current position
         cryptid.GetComponent<cryptid>().setLocationFromCurrent();
 
+        // non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
         {
             cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
 
             currentCryptid = Instantiate(cryptid, transform);
         }
+        // floor cyptid placement
         else
         {
             Vector3 floor = transform.position;
@@ -91,8 +97,10 @@ public class cryptidGen : MonoBehaviour
 
     public void createSpecificCryptid(string name)
     {
+        // empty space for cryptid
         GameObject cryptid = null;
 
+        // find cryptid name in list
         foreach(GameObject nextCryptid in list)
         {
             if(nextCryptid.name == name)
@@ -102,13 +110,14 @@ public class cryptidGen : MonoBehaviour
             }
         }
 
-
+        //non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
         {
             cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
 
             currentCryptid = Instantiate(cryptid, transform);
         }
+        // floor cryptid placement
         else
         {
             Vector3 floor = transform.position;
@@ -122,6 +131,35 @@ public class cryptidGen : MonoBehaviour
         }
 
         serverRep.addCryptid(cryptid);
+        exists = true;
+    }
+
+    public void createExistingCryptid(GameObject cryptid)
+    {
+        // increase power of cryptid
+
+        cryptid.GetComponent<cryptid>().increasePower();
+
+        //non-floor cryptid placement
+        if (!cryptid.GetComponent<cryptid>().floor)
+        {
+            cryptid.transform.position = new Vector3(UnityEngine.Random.Range(BL.position.x, TR.position.x), UnityEngine.Random.Range(BL.position.y, TR.position.y), UnityEngine.Random.Range(BL.position.z, TR.position.z));
+
+            currentCryptid = Instantiate(cryptid, transform);
+        }
+        // floor cryptid placement
+        else
+        {
+            Vector3 floor = transform.position;
+            foreach (var plane in planeManager.trackables)
+            {
+                floor = plane.transform.position;
+            }
+
+            cryptid.transform.position = floor;
+            currentCryptid = Instantiate(cryptid, transform);
+        }
+
         exists = true;
     }
     
