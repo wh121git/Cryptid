@@ -398,6 +398,7 @@ MonoBehaviour:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 9403ec37253316f4bba423fb9cfa96ed, type: 3}
   - {fileID: 867760034644781879, guid: e6e6b5e8498d22544ad093f701f5482a, type: 3}
+  - {fileID: 7499257698806027525, guid: deb9152c03bb91e44b63143e1b571414, type: 3}
   upgradeKey:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   upgradeItem:
