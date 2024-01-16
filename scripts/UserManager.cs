@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Android;
 using System;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 /*
  * Code sources:
@@ -23,6 +24,7 @@ public class UserManager : MonoBehaviour
     public cryptidGen cryptidGen;
     public MobileNotifications mobileNotifications;
     public serverRep serverRep;
+    public DebugDisplay debugDisplay;
 
     // score functionality
     private int score;
@@ -34,18 +36,30 @@ public class UserManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
+
     private void Start()
     {
 
         //[3]
         score = PlayerPrefs.GetInt("score", 0);
 
+
+        GetPlayerLocation();
+  
+
+        if(score == 0)
+        {
+            PlayerPrefs.SetInt("score", 0);
+        }
+
+    }
+    private void initCryptid()
+    {
+
         DateTime now = DateTime.Now;
 
         // check that an hour has passed
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
-
-        GetPlayerLocation();
 
         // check if there is a cryptid at this location
         if (serverRep.findCryptid(userLocation) != null)
@@ -61,14 +75,6 @@ public class UserManager : MonoBehaviour
                 cryptidGen.createCryptid();
             }
         }
-  
-
-
-        if(score == 0)
-        {
-            PlayerPrefs.SetInt("score", 0);
-        }
-
     }
     private void OnApplicationQuit()
     {
@@ -192,6 +198,8 @@ public class UserManager : MonoBehaviour
 
     private IEnumerator Location()
     {
+        
+
         // permissions from the user
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
@@ -230,11 +238,15 @@ public class UserManager : MonoBehaviour
         else
         {
             // If the connection succeeded, this retrieves the device's current location, returning a rounded version to the user location variables
+            Debug.Log("Fetched location");
             userLocation.Item1 = Input.location.lastData.latitude;
             userLocation.Item1 = (float)Math.Ceiling(userLocation.Item1 * 100f) / 100f;
             userLocation.Item2 = Input.location.lastData.longitude;
             userLocation.Item2 = (float)Math.Ceiling(userLocation.Item2 * 100f) / 100f;
+            Debug.Log(userLocation.Item1 + " " + userLocation.Item2);
         }
+
+        initCryptid();
 
         // Stops the location service if there is no need to query location updates continuously.
         Input.location.Stop();

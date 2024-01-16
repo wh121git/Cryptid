@@ -92,7 +92,7 @@ public class cryptidGen : MonoBehaviour
 
         exists = true;
 
-
+        Debug.Log("Default Cryptid Created");
     }
 
     public void createSpecificCryptid(string name)
@@ -100,8 +100,14 @@ public class cryptidGen : MonoBehaviour
         // empty space for cryptid
         GameObject cryptid = null;
 
+        // delete current cryptid
+        if (currentCryptid)
+        {
+            GameObject.Destroy(currentCryptid);
+        }
+
         // find cryptid name in list
-        foreach(GameObject nextCryptid in list)
+        foreach (GameObject nextCryptid in list)
         {
             if(nextCryptid.name == name)
             {
@@ -132,6 +138,8 @@ public class cryptidGen : MonoBehaviour
 
         serverRep.addCryptid(cryptid);
         exists = true;
+
+        Debug.Log("Summon Crytpid from name");
     }
 
     public void createExistingCryptid(GameObject cryptid)
@@ -139,6 +147,12 @@ public class cryptidGen : MonoBehaviour
         // increase power of cryptid
 
         cryptid.GetComponent<cryptid>().increasePower();
+
+        // delete current cryptid
+        if (currentCryptid)
+        {
+            GameObject.Destroy(currentCryptid);
+        }
 
         //non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
@@ -161,6 +175,8 @@ public class cryptidGen : MonoBehaviour
         }
 
         exists = true;
+
+        Debug.Log("Create from Server, values: " + cryptid.GetComponent<cryptid>().getLocation().Item1 + " " + cryptid.GetComponent<cryptid>().getLocation().Item2);
     }
     
     public void DeleteCryptid()

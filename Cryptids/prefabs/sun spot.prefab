@@ -96,5 +96,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b7c86a5c2469c04f883b04bd507a1d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreCheck: 12
+  powerCap: 5
   floor: 0

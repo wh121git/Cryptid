@@ -23,12 +23,17 @@ public class DebugDisplay : MonoBehaviour
 
     void HandleLog(string logString, string stackTrace, LogType type)
     {
-        output = logString;
-        stack = stackTrace;
+        output += "||" + logString;
+        stack += "||" + stackTrace;
     }
 
     private void Update()
     {
         text.GetComponent<Text>().text = output;
+    }
+
+    public void clearDebug()
+    {
+        output = string.Empty;
     }
 }
