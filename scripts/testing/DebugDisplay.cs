@@ -8,8 +8,13 @@ public class DebugDisplay : MonoBehaviour
     public GameObject text;
 
     // [1] Basic log debug message documentation https://docs.unity3d.com/ScriptReference/Application-logMessageReceived.html
-    public string output = "";
-    public string stack = "";
+    public string debugOutput = "";
+    public string debugStack = "";
+
+    public string ownOutput = "";
+
+    public bool fullDebug = false;
+    public bool ownDebug = false;
 
     void OnEnable()
     {
@@ -21,19 +26,33 @@ public class DebugDisplay : MonoBehaviour
         Application.logMessageReceived -= HandleLog;
     }
 
+    
     void HandleLog(string logString, string stackTrace, LogType type)
     {
-        output += "||" + logString;
-        stack += "||" + stackTrace;
+        debugOutput += "||" + logString;
+        debugStack += "||" + stackTrace;
     }
+    
 
     private void Update()
     {
-        text.GetComponent<Text>().text = output;
+        if (fullDebug)
+        {
+            text.GetComponent<Text>().text = debugOutput;
+        }
+        if (ownDebug)
+        {
+            text.GetComponent<Text>().text = ownOutput;
+        }
     }
 
     public void clearDebug()
     {
-        output = string.Empty;
+        debugOutput = string.Empty;
+    }
+
+    public void addOut(string output)
+    {
+        ownOutput += "|| " + output;
     }
 }

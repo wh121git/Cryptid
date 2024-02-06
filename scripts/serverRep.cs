@@ -1,103 +1,101 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class serverRep : MonoBehaviour
 {
-    public List<GameObject> cryptids = new List<GameObject>();
+    public DebugDisplay debugDisplay;
+    public UserManager userManager;
 
-    public List<(float, float)> locations = new List<(float, float)>();
+
+    // library of cryptid ids
+    public List<GameObject> library = new List<GameObject>();
+
+    // buffer for new cryptid
+    public (int, int) cryptidBuffer;
+
+    // location X, location Y, cryptid, cryptid power
+    private List<(float, float, int, int)> cryptids = new List<(float,float, int, int)>();
 
     private void Start()
     {
-        if (PlayerPrefs.GetFloat("loc" + 0 + "x", 0f) != 0f)
-        {
-            int i = 0;
-            while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
-            {
-                locations.Add((PlayerPrefs.GetFloat("loc" + i + "x"), PlayerPrefs.GetFloat("loc" + i + "y")));
-                i++;
-            }
-        }
-        else
-        {
-            setObjects();
-            saveLoc();
-            savePower();
-        }
+        debugDisplay.addOut("Start print : " + PlayerPrefs.GetString("test", "unsaved"));
 
-    }
-
-    public void setObjects()
-    {
-        locations.Add((51.98000f, -2.06000f));
-        locations.Add((51.99000f, -2.06000f));
-        locations.Add((51.97000f, -2.06000f));
-
-        for(int i = 0; i < cryptids.Count; i++)
-        {
-            cryptids[i].GetComponent<cryptid>().setLocation(locations[i].Item1, locations[i].Item2);
-            cryptids[i].GetComponent<cryptid>().setPower(PlayerPrefs.GetInt("pow" + i));
-        }
-    }
-
-    public void saveLoc()
-    {
+        // iterate through saved values and populate server rep
         int i = 0;
-
-        foreach ((float, float) loc in locations)
+        while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
         {
-            PlayerPrefs.SetFloat("loc" + i + "x", loc.Item1);
-            PlayerPrefs.SetFloat("loc" + i + "y", loc.Item2);
+            cryptids.Add((PlayerPrefs.GetFloat("loc" + i + "x"),
+            PlayerPrefs.GetFloat("loc"+i+"y"),
+            PlayerPrefs.GetInt("id"+i),
+            PlayerPrefs.GetInt("pow" + i)));
+
+            // debug out
+            debugDisplay.addOut(cryptids[i].Item1 + "," + cryptids[i].Item2 + "," + cryptids[i].Item3 + "," + cryptids[i].Item4);
+
             i++;
+
+            
         }
     }
 
-    public void savePower()
+
+
+    // create buffer cryptid
+    public void addToBuffer(string name, int power)
     {
+        // find correct id
         int i = 0;
-
-        foreach(GameObject cryptid in cryptids)
+        foreach(GameObject c in library)
         {
-            PlayerPrefs.SetInt("pow" + i, cryptid.GetComponent<cryptid>().getPower());
-        }
-    }
-
-    public void addCryptid(GameObject cryptid)
-    {
-        cryptids.Add(cryptid);
-        locations.Add(cryptid.GetComponent<cryptid>().getLocation());
-
-        saveLoc();
-        savePower();
-    }
-
-    public GameObject findCryptid((float, float) location)
-    {
-        foreach(GameObject cryptid in cryptids)
-        {
-            if(cryptid.GetComponent<cryptid>().getLocation() == location)
+            if(c.name == name)
             {
-                return cryptid;
-            }
-        }
-
-        return null;
-    }
-
-    public void removeCryptid((float,float) location)
-    {
-        for(int i = 0; i < cryptids.Count; i++)
-        {
-            if (locations[i] == location)
-            {
-                cryptids.RemoveAt(i);
-                locations.RemoveAt(i);
-
-                saveLoc();
-                savePower();
                 break;
             }
+
+            i++;
         }
+
+        cryptidBuffer.Item1 = i;
+        cryptidBuffer.Item2 = power;
+
+        StartCoroutine(SaveData());
+       
+    }
+
+    private IEnumerator SaveData()
+    {
+        while(userManager.userLocation.Item1 == 0)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+
+        int i = 0;
+        while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
+        {
+            i++;
+        }
+
+        PlayerPrefs.SetFloat("loc" + i + "x", userManager.userLocation.Item1);
+        PlayerPrefs.SetFloat("loc" + i + "y", userManager.userLocation.Item2);
+        PlayerPrefs.SetInt("id" + i, cryptidBuffer.Item1);
+        PlayerPrefs.SetInt("pow" + i, cryptidBuffer.Item2);
+    }
+
+    public (GameObject, int) findCryptid((float, float) userLocation)
+    {
+        // iterate over server
+        int i = 0;
+        while(PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
+        {
+            if(PlayerPrefs.GetFloat("loc" + i + "x") == userLocation.Item1 && PlayerPrefs.GetFloat("loc" + i + "y") == userLocation.Item2)
+            {
+                return (library[PlayerPrefs.GetInt("id" + i)], PlayerPrefs.GetInt("pow" + i));
+            }
+            i++;
+        }
+
+        return (null,0);
     }
 }

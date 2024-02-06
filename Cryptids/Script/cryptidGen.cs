@@ -17,6 +17,7 @@ public class cryptidGen : MonoBehaviour
     public serverRep serverRep;
     public int randomChance;
     public bool exists;
+    public DebugDisplay debugDisplay;
 
     public Transform BL;
     public Transform TR;
@@ -67,9 +68,6 @@ public class cryptidGen : MonoBehaviour
             }
         }
 
-        // set location to current position
-        cryptid.GetComponent<cryptid>().setLocationFromCurrent();
-
         // non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
         {
@@ -92,7 +90,8 @@ public class cryptidGen : MonoBehaviour
 
         exists = true;
 
-        Debug.Log("Default Cryptid Created");
+        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
+        debugDisplay.addOut("Default Cryptid Created");
     }
 
     public void createSpecificCryptid(string name)
@@ -136,22 +135,40 @@ public class cryptidGen : MonoBehaviour
             currentCryptid = Instantiate(cryptid, transform);
         }
 
-        serverRep.addCryptid(cryptid);
         exists = true;
 
-        Debug.Log("Summon Crytpid from name");
+        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
+        debugDisplay.addOut("Summon Crytpid from name");
     }
 
-    public void createExistingCryptid(GameObject cryptid)
+    public void createExistingCryptid(GameObject cryptid, int power)
     {
         // increase power of cryptid
-
+        cryptid.GetComponent<cryptid>().setPower(power);
         cryptid.GetComponent<cryptid>().increasePower();
 
         // delete current cryptid
         if (currentCryptid)
         {
             GameObject.Destroy(currentCryptid);
+        }
+
+        // upgrade cryptid
+        while (cryptid.GetComponent<cryptid>().checkPower())
+        {
+            if (upgrades.ContainsKey(cryptid))
+            {
+                int upgradeRandom = UnityEngine.Random.Range(0, 100);
+
+                if (upgradeRandom > randomChance)
+                {
+                    cryptid = upgrades[cryptid];
+                }
+            }
+            else
+            {
+                break;
+            }
         }
 
         //non-floor cryptid placement
@@ -174,9 +191,9 @@ public class cryptidGen : MonoBehaviour
             currentCryptid = Instantiate(cryptid, transform);
         }
 
+        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
         exists = true;
 
-        Debug.Log("Create from Server, values: " + cryptid.GetComponent<cryptid>().getLocation().Item1 + " " + cryptid.GetComponent<cryptid>().getLocation().Item2);
     }
     
     public void DeleteCryptid()

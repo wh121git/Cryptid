@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Android;
 using System;
-using static UnityEngine.Rendering.DebugUI.Table;
+
 
 /*
  * Code sources:
@@ -28,7 +28,8 @@ public class UserManager : MonoBehaviour
 
     // score functionality
     private int score;
-    private (float, float) userLocation;
+
+    public (float, float) userLocation;
 
     // make permenant through reloads
     private void Awake()
@@ -45,7 +46,6 @@ public class UserManager : MonoBehaviour
 
 
         GetPlayerLocation();
-  
 
         if(score == 0)
         {
@@ -62,14 +62,15 @@ public class UserManager : MonoBehaviour
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
         // check if there is a cryptid at this location
-        if (serverRep.findCryptid(userLocation) != null)
+        (GameObject, int) serverOut = serverRep.findCryptid(userLocation);
+        if (serverOut.Item1 != null)
         {
-            cryptidGen.createSpecificCryptid(serverRep.findCryptid(userLocation).name);
-            cryptidGen.createExistingCryptid(serverRep.findCryptid(userLocation));
+            cryptidGen.createExistingCryptid(serverOut.Item1, serverOut.Item2);
         }
         // otherwise randomly generate after an hour
         else
         {
+            if (then.AddHours(1) < now)
             if (then.AddHours(1) < now)
             {
                 cryptidGen.createCryptid();
@@ -117,7 +118,6 @@ public class UserManager : MonoBehaviour
         {
             // allow co-routine to ensure end of frame
             StartCoroutine(takePictureEn());
-            serverRep.removeCryptid(userLocation);
         }
         else
         {
@@ -209,7 +209,7 @@ public class UserManager : MonoBehaviour
 
         // Check permissions
         if (!Input.location.isEnabledByUser)
-            Debug.Log("Location not enabled on device or app does not have permission to access location");
+            debugDisplay.addOut("Location not enabled on device or app does not have permission to access location");
 
         // Starts the location service.
         Input.location.Start();
@@ -225,25 +225,24 @@ public class UserManager : MonoBehaviour
         // If the service didn't initialize in 20 seconds this cancels location service use.
         if (maxWait < 1)
         {
-            Debug.Log("Timed out");
+            debugDisplay.addOut("Timed out");
             yield break;
         }
 
         // If the connection failed this cancels location service use.
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            Debug.LogError("Unable to determine device location");
+            debugDisplay.addOut("Unable to determine device location");
             yield break;
         }
         else
         {
             // If the connection succeeded, this retrieves the device's current location, returning a rounded version to the user location variables
-            Debug.Log("Fetched location");
             userLocation.Item1 = Input.location.lastData.latitude;
             userLocation.Item1 = (float)Math.Ceiling(userLocation.Item1 * 100f) / 100f;
             userLocation.Item2 = Input.location.lastData.longitude;
             userLocation.Item2 = (float)Math.Ceiling(userLocation.Item2 * 100f) / 100f;
-            Debug.Log(userLocation.Item1 + " " + userLocation.Item2);
+            debugDisplay.addOut("current Location: " + userLocation.ToString());
         }
 
         initCryptid();
