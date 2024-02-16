@@ -20,7 +20,10 @@ public class cryptid : MonoBehaviour
 
     public void setPower(int newPower)
     {
-        power = newPower;
+        if (newPower > 0)
+        {
+            power = power + newPower;
+        }
     }
 
     public bool checkPower()

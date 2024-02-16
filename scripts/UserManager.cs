@@ -62,10 +62,12 @@ public class UserManager : MonoBehaviour
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
         // check if there is a cryptid at this location
-        (GameObject, int) serverOut = serverRep.findCryptid(userLocation);
+        (GameObject, String) serverOut = serverRep.findCryptid(userLocation);
         if (serverOut.Item1 != null)
         {
-            cryptidGen.createExistingCryptid(serverOut.Item1, serverOut.Item2);
+            DateTime.TryParse(serverOut.Item2, out DateTime cryptidInit);
+            TimeSpan duration = now - cryptidInit;
+            cryptidGen.createExistingCryptid(serverOut.Item1, duration.Hours);
         }
         // otherwise randomly generate after an hour
         else

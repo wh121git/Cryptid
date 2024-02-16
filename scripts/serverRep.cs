@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class serverRep : MonoBehaviour
@@ -13,14 +14,16 @@ public class serverRep : MonoBehaviour
     public List<GameObject> library = new List<GameObject>();
 
     // buffer for new cryptid
-    public (int, int) cryptidBuffer;
+    public int cryptidBuffer;
 
-    // location X, location Y, cryptid, cryptid power
-    private List<(float, float, int, int)> cryptids = new List<(float,float, int, int)>();
+    // location X, location Y, cryptid, time innit
+    private List<(float, float, int, string)> cryptids = new List<(float,float, int, string)>();
 
     private void Start()
     {
-        debugDisplay.addOut("Start print : " + PlayerPrefs.GetString("test", "unsaved"));
+        String now = DateTime.Now.ToString();
+        
+        debugDisplay.addOut("Start print : ");
 
         // iterate through saved values and populate server rep
         int i = 0;
@@ -29,7 +32,7 @@ public class serverRep : MonoBehaviour
             cryptids.Add((PlayerPrefs.GetFloat("loc" + i + "x"),
             PlayerPrefs.GetFloat("loc"+i+"y"),
             PlayerPrefs.GetInt("id"+i),
-            PlayerPrefs.GetInt("pow" + i)));
+            PlayerPrefs.GetString("init" + i)));
 
             // debug out
             debugDisplay.addOut(cryptids[i].Item1 + "," + cryptids[i].Item2 + "," + cryptids[i].Item3 + "," + cryptids[i].Item4);
@@ -43,7 +46,7 @@ public class serverRep : MonoBehaviour
 
 
     // create buffer cryptid
-    public void addToBuffer(string name, int power)
+    public void addToBuffer(string name)
     {
         // find correct id
         int i = 0;
@@ -57,8 +60,7 @@ public class serverRep : MonoBehaviour
             i++;
         }
 
-        cryptidBuffer.Item1 = i;
-        cryptidBuffer.Item2 = power;
+        cryptidBuffer = i;
 
         StartCoroutine(SaveData());
        
@@ -66,6 +68,9 @@ public class serverRep : MonoBehaviour
 
     private IEnumerator SaveData()
     {
+       
+        bool saved = false;
+
         while(userManager.userLocation.Item1 == 0)
         {
             yield return new WaitForSeconds(1f);
@@ -74,16 +79,27 @@ public class serverRep : MonoBehaviour
         int i = 0;
         while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
         {
+            if (PlayerPrefs.GetFloat("loc" + i + "x") == userManager.userLocation.Item1)
+            {
+                saved = true;
+                debugDisplay.addOut("loc");
+                PlayerPrefs.SetInt("id" + i, cryptidBuffer);
+                break;
+            }
             i++;
         }
 
-        PlayerPrefs.SetFloat("loc" + i + "x", userManager.userLocation.Item1);
-        PlayerPrefs.SetFloat("loc" + i + "y", userManager.userLocation.Item2);
-        PlayerPrefs.SetInt("id" + i, cryptidBuffer.Item1);
-        PlayerPrefs.SetInt("pow" + i, cryptidBuffer.Item2);
+        if (saved == false)
+        {
+            PlayerPrefs.SetFloat("loc" + i + "x", userManager.userLocation.Item1);
+            PlayerPrefs.SetFloat("loc" + i + "y", userManager.userLocation.Item2);
+            PlayerPrefs.SetInt("id" + i, cryptidBuffer);
+            PlayerPrefs.SetString("init" + i, DateTime.Now.ToString());
+            saved = true;
+        }
     }
 
-    public (GameObject, int) findCryptid((float, float) userLocation)
+    public (GameObject, String) findCryptid((float, float) userLocation)
     {
         // iterate over server
         int i = 0;
@@ -91,11 +107,11 @@ public class serverRep : MonoBehaviour
         {
             if(PlayerPrefs.GetFloat("loc" + i + "x") == userLocation.Item1 && PlayerPrefs.GetFloat("loc" + i + "y") == userLocation.Item2)
             {
-                return (library[PlayerPrefs.GetInt("id" + i)], PlayerPrefs.GetInt("pow" + i));
+                return (library[PlayerPrefs.GetInt("id" + i)], PlayerPrefs.GetString("init" + i));
             }
             i++;
         }
 
-        return (null,0);
+        return (null,"null");
     }
 }

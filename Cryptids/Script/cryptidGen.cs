@@ -90,7 +90,7 @@ public class cryptidGen : MonoBehaviour
 
         exists = true;
 
-        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
+        serverRep.addToBuffer(cryptid.name);
         debugDisplay.addOut("Default Cryptid Created");
     }
 
@@ -137,7 +137,7 @@ public class cryptidGen : MonoBehaviour
 
         exists = true;
 
-        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
+        serverRep.addToBuffer(cryptid.name);
         debugDisplay.addOut("Summon Crytpid from name");
     }
 
@@ -145,7 +145,7 @@ public class cryptidGen : MonoBehaviour
     {
         // increase power of cryptid
         cryptid.GetComponent<cryptid>().setPower(power);
-        cryptid.GetComponent<cryptid>().increasePower();
+        debugDisplay.addOut("power " + power);
 
         // delete current cryptid
         if (currentCryptid)
@@ -191,7 +191,7 @@ public class cryptidGen : MonoBehaviour
             currentCryptid = Instantiate(cryptid, transform);
         }
 
-        serverRep.addToBuffer(cryptid.name, cryptid.GetComponent<cryptid>().getPower());
+        serverRep.addToBuffer(cryptid.name);
         exists = true;
 
     }
