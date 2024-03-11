@@ -40,6 +40,8 @@ public class cryptidGen : MonoBehaviour
 
     public void createCryptid()
     {
+        Debug.Log("default created");
+
         // delete current cryptid
         if (currentCryptid)
         {
@@ -96,6 +98,8 @@ public class cryptidGen : MonoBehaviour
 
     public void createSpecificCryptid(string name)
     {
+        
+
         // empty space for cryptid
         GameObject cryptid = null;
 
@@ -114,7 +118,7 @@ public class cryptidGen : MonoBehaviour
                 break;
             }
         }
-
+        Debug.Log(name);
         //non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
         {
@@ -143,9 +147,10 @@ public class cryptidGen : MonoBehaviour
 
     public void createExistingCryptid(GameObject cryptid, int power)
     {
+        Debug.Log("existing made");
         // increase power of cryptid
         cryptid.GetComponent<cryptid>().setPower(power);
-        debugDisplay.addOut("power " + power);
+        
 
         // delete current cryptid
         if (currentCryptid)

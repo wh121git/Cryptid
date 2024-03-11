@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.Android;
 using System;
+using UnityEngine.Rendering;
 
 
 /*
@@ -148,7 +149,7 @@ public class UserManager : MonoBehaviour
             screenshot.Apply();
 
             // saves image as: Cryptid_Capture_[name of cryptid](Clone)_[date].png
-            string imgName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "_" + cryptidGen.getCurrentCryptidName(), System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            string imgName = string.Format("{0}_Capture{1}_{2}.png", Application.productName, "[" + cryptidGen.getCurrentCryptidName() + "]", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
             
             //[4]
             Debug.Log("Permission result: " + NativeGallery.SaveImageToGallery(screenshot, Application.productName + " Captures", imgName));
@@ -168,21 +169,30 @@ public class UserManager : MonoBehaviour
         //[5]
         NativeGallery.GetImageFromGallery((path) =>
         {
+            
             if (path != null)
             {
-                // Create Texture from selected image
-                var pathArray = path.Split('/');
-                string output = "";
-
-                foreach (string seg in pathArray)
+                String name = "";
+                bool store = false;
+               foreach(char c in path)
                 {
-                    output = seg;
+                    if(c == '[')
+                    {
+                        store = true;
+                    }
+                    if(c == ']')
+                    {
+                        store = false;
+                    }
+                    if(store)
+                    {
+                        name += c;
+                    }
                 }
 
-                // get cryptid name specifically
-                output = output.Substring(16, output.Length - 47);
-                
-                cryptidGen.createSpecificCryptid(output);
+                name = name.Substring(0, name.Length - 7);
+                Debug.Log(name);
+                cryptidGen.createSpecificCryptid(name);
 
                 // delete image
                 File.Delete(path);
