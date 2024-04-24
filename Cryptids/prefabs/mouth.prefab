@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 6a173b0937043e64aba457580130c9a0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -98,3 +98,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   powerCap: 7
   floor: 0
+  rotate: 0
+  objUpgrade: {fileID: 0}
+  rotateSpeed: 0

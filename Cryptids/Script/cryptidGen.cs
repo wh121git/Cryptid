@@ -9,24 +9,35 @@ using UnityEngine.XR;
 using UnityEngine.XR.ARFoundation;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Diagnostics;
+using Unity.Services.Core;
+using System.Linq;
 
 
 public class cryptidGen : MonoBehaviour
 {
+    // Fetch scripts and functions 
+    public DebugDisplay debugDisplay;
     public UserManager UserManager;
     public serverRep serverRep;
-    public int randomChance;
-    public bool exists;
-    public DebugDisplay debugDisplay;
-
-    public Transform BL;
-    public Transform TR;
     public ARPlaneManager planeManager;
 
+    // public editables
+    public int randomChance;
+    public Transform BL;
+    public Transform TR;
     public List<GameObject> list = new List<GameObject>();
     public List<GameObject> upgradeKey = new List<GameObject>();
     public List<GameObject> upgradeItem = new List<GameObject>();
- 
+    
+    // Object Cryptid functionality
+    private GameObject objTarget;
+    private GameObject objNewCryptid;
+    private GameObject objOldCryptid;
+    
+    // Internal function
+    public bool exists;
+
     private Dictionary<GameObject, GameObject> upgrades = new Dictionary<GameObject, GameObject>();
     private GameObject currentCryptid = null;
 
@@ -38,9 +49,62 @@ public class cryptidGen : MonoBehaviour
         }
     }
 
+    public void DeleteCryptid()
+    {
+        GameObject.Destroy(currentCryptid);
+        exists = false;
+    }
+
+    public string getCurrentCryptidName()
+    {
+        return currentCryptid.name;
+    }
+
+    public void setObjTarget(GameObject objTarget)
+    {
+        
+        this.objTarget = objTarget;
+    }
+
+    public void setObjNewCryptid(GameObject objNewCryptid)
+    {
+        this.objNewCryptid = objNewCryptid;
+    }
+
+    public void setObjOldCryptid(GameObject objOldCryptid)
+    {
+        this.objOldCryptid = objOldCryptid;
+    }
+
+    public GameObject upgrade(GameObject cryptid)
+    {
+        // upgrade cryptid
+        while (cryptid.GetComponent<cryptid>().checkPower())
+        {
+            if (upgrades.ContainsKey(cryptid))
+            {
+                
+
+                int upgradeRandom = UnityEngine.Random.Range(0, 100);
+
+                if (/*upgradeRandom > randomChance*/ true)
+                {
+                    
+                    return upgrades[cryptid];
+                }
+            }
+            else
+            {
+                return cryptid;
+            }
+        }
+
+        return cryptid;
+    }
+
     public void createCryptid()
     {
-        Debug.Log("default created");
+        UnityEngine.Debug.Log("default created");
 
         // delete current cryptid
         if (currentCryptid)
@@ -53,22 +117,7 @@ public class cryptidGen : MonoBehaviour
         GameObject cryptid = list[i];
 
         // upgrade cryptid
-        while (cryptid.GetComponent<cryptid>().checkPower())
-        {
-            if (upgrades.ContainsKey(cryptid))
-            {
-                int upgradeRandom = UnityEngine.Random.Range(0, 100);
-
-                if (upgradeRandom > randomChance)
-                {
-                    cryptid = upgrades[cryptid];
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
+        cryptid = upgrade(cryptid);
 
         // non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
@@ -112,13 +161,15 @@ public class cryptidGen : MonoBehaviour
         // find cryptid name in list
         foreach (GameObject nextCryptid in list)
         {
-            if(nextCryptid.name == name)
+            UnityEngine.Debug.Log(nextCryptid.name + " " + name);
+            if (nextCryptid.name.Equals(name))
             {
                 cryptid = nextCryptid;
+                
                 break;
             }
         }
-        Debug.Log(name);
+        
         //non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
         {
@@ -147,7 +198,7 @@ public class cryptidGen : MonoBehaviour
 
     public void createExistingCryptid(GameObject cryptid, int power)
     {
-        Debug.Log("existing made");
+        UnityEngine.Debug.Log("existing made");
         // increase power of cryptid
         cryptid.GetComponent<cryptid>().setPower(power);
         
@@ -159,22 +210,7 @@ public class cryptidGen : MonoBehaviour
         }
 
         // upgrade cryptid
-        while (cryptid.GetComponent<cryptid>().checkPower())
-        {
-            if (upgrades.ContainsKey(cryptid))
-            {
-                int upgradeRandom = UnityEngine.Random.Range(0, 100);
-
-                if (upgradeRandom > randomChance)
-                {
-                    cryptid = upgrades[cryptid];
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
+        cryptid = upgrade(cryptid);
 
         //non-floor cryptid placement
         if (!cryptid.GetComponent<cryptid>().floor)
@@ -200,15 +236,40 @@ public class cryptidGen : MonoBehaviour
         exists = true;
 
     }
-    
-    public void DeleteCryptid()
+
+    public void createObjCryptid()
     {
-        GameObject.Destroy(currentCryptid);
-        exists = false;
+        StartCoroutine(createObjCryptidEn());
     }
 
-    public string getCurrentCryptidName()
+    public IEnumerator createObjCryptidEn()
     {
-        return currentCryptid.name;
-    }    
+        yield return new WaitForSeconds(1f);
+        
+        debugDisplay.addOut(PlayerPrefs.GetInt(objNewCryptid.name).ToString());
+        // update power
+        int power = PlayerPrefs.GetInt(objNewCryptid.name, 0);
+        if(power == 0) { PlayerPrefs.SetInt(objNewCryptid.name, 1); }
+        power++;
+        PlayerPrefs.SetInt(objNewCryptid.name, power);
+
+        // increase power of cryptid
+        objNewCryptid.GetComponent<cryptid>().setPower(power);
+
+        // delete current cryptid
+        if (currentCryptid)
+        {
+            GameObject.Destroy(currentCryptid);
+        }
+
+        // upgrade cryptid
+        objNewCryptid = upgrade(objNewCryptid);
+
+        currentCryptid = Instantiate(objNewCryptid, objOldCryptid.transform);
+        currentCryptid.transform.parent = objTarget.transform;
+
+        debugDisplay.addOut(currentCryptid.name);
+
+        exists = true;
+    }
 }

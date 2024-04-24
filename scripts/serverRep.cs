@@ -9,7 +9,6 @@ public class serverRep : MonoBehaviour
     public DebugDisplay debugDisplay;
     public UserManager userManager;
 
-
     // library of cryptid ids
     public List<GameObject> library = new List<GameObject>();
 

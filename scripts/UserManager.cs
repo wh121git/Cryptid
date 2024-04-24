@@ -73,8 +73,7 @@ public class UserManager : MonoBehaviour
         // otherwise randomly generate after an hour
         else
         {
-            if (then.AddHours(1) < now)
-            if (then.AddHours(1) < now)
+            if (then.AddSeconds(1) < now)
             {
                 cryptidGen.createCryptid();
             }
@@ -176,22 +175,22 @@ public class UserManager : MonoBehaviour
                 bool store = false;
                foreach(char c in path)
                 {
-                    if(c == '[')
-                    {
-                        store = true;
-                    }
-                    if(c == ']')
+                    if (c == ']')
                     {
                         store = false;
                     }
-                    if(store)
+                    if (store)
                     {
                         name += c;
+                    }
+                    if (c == '[')
+                    {
+                        store = true;
                     }
                 }
 
                 name = name.Substring(0, name.Length - 7);
-                Debug.Log(name);
+                Debug.Log("button " + name);
                 cryptidGen.createSpecificCryptid(name);
 
                 // delete image

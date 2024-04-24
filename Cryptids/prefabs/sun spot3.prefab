@@ -98,3 +98,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   powerCap: 0
   floor: 0
+  rotate: 1
+  rotateSpeed: 5
