@@ -22,7 +22,7 @@ public class HTTP_Request : MonoBehaviour
         StartCoroutine(GetE(x,y));
     }
 
-    IEnumerator GetE(float x, float y)
+    private IEnumerator GetE(float x, float y)
     {
         UnityWebRequest wr = new UnityWebRequest("https://localhost:7078/Instance?x=" + x + "&y=" + y);
         wr.downloadHandler = new DownloadHandlerBuffer();
@@ -46,9 +46,33 @@ public class HTTP_Request : MonoBehaviour
         StartCoroutine(PostE(id, init, x, y));
     }
 
-    IEnumerator PostE(int id, string init, float x, float y)
+    private IEnumerator PostE(int id, string init, float x, float y)
     {
         UnityWebRequest wr = new UnityWebRequest("https://localhost:7078/Instance?id=" + id + "&init=" + init + "&x=" + x + "&y=" + y);
+        wr.downloadHandler = new DownloadHandlerBuffer();
+        yield return wr.SendWebRequest();
+
+        UnityEngine.Debug.Log(output.text);
+
+        if (wr.result != UnityWebRequest.Result.Success)
+        {
+            output.text = wr.error;
+        }
+        else
+        {
+            // Show results as text
+            data = JsonUtility.FromJson<CryptidInstance>(wr.downloadHandler.text);
+        }      
+    }
+    
+    public void Put(float x, float y, int _id)
+    {
+        StartCoroutine(PutE(x, y, _id));
+    }
+
+    private IEnumerator PutE(float x, float y, int _id)
+    {
+        UnityWebRequest wr = new UnityWebRequest("https://localhost:7078/Instance?x=" + x + "&y=" + y + "&_id=" + _id);
         wr.downloadHandler = new DownloadHandlerBuffer();
         yield return wr.SendWebRequest();
 

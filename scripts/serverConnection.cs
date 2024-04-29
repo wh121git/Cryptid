@@ -9,38 +9,16 @@ public class serverConnection : MonoBehaviour
     public DebugDisplay debugDisplay;
     public UserManager userManager;
 
+    public HTTP_Request HTTP_Request;
+
     // library of cryptid ids
     public List<GameObject> library = new List<GameObject>();
 
     // buffer for new cryptid
     public int cryptidBuffer;
 
-    // location X, location Y, cryptid, time innit
-    private List<(float, float, int, string)> cryptids = new List<(float,float, int, string)>();
+    private (GameObject, string) fetchedCryptid;
 
-    private void Start()
-    {
-        String now = DateTime.Now.ToString();
-        
-        debugDisplay.addOut("Start print : ");
-
-        // iterate through saved values and populate server rep
-        int i = 0;
-        while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
-        {
-            cryptids.Add((PlayerPrefs.GetFloat("loc" + i + "x"),
-            PlayerPrefs.GetFloat("loc"+i+"y"),
-            PlayerPrefs.GetInt("id"+i),
-            PlayerPrefs.GetString("init" + i)));
-
-            // debug out
-            debugDisplay.addOut(cryptids[i].Item1 + "," + cryptids[i].Item2 + "," + cryptids[i].Item3 + "," + cryptids[i].Item4);
-
-            i++;
-
-            
-        }
-    }
 
 
 
@@ -61,11 +39,11 @@ public class serverConnection : MonoBehaviour
 
         cryptidBuffer = i;
 
-        StartCoroutine(SaveData());
+        StartCoroutine(SaveData(i));
        
     }
 
-    private IEnumerator SaveData()
+    private IEnumerator SaveData(int i)
     {
        
         bool saved = false;
@@ -75,42 +53,30 @@ public class serverConnection : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
-        int i = 0;
-        while (PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
+        // upgrade Cryptid
+        if(HTTP_Request.Get(userManager.userLocation.Item1, userManager.userLocation.Item2) != null)
         {
-            if (PlayerPrefs.GetFloat("loc" + i + "x") == userManager.userLocation.Item1)
-            {
-                saved = true;
-                debugDisplay.addOut("loc");
-                PlayerPrefs.SetInt("id" + i, cryptidBuffer);
-                break;
-            }
-            i++;
+            HTTP_Request.Put(userManager.userLocation.Item1, userManager.userLocation.Item2, i);
+            saved = true;
         }
 
         if (saved == false)
         {
-            PlayerPrefs.SetFloat("loc" + i + "x", userManager.userLocation.Item1);
-            PlayerPrefs.SetFloat("loc" + i + "y", userManager.userLocation.Item2);
-            PlayerPrefs.SetInt("id" + i, cryptidBuffer);
-            PlayerPrefs.SetString("init" + i, DateTime.Now.ToString());
+            HTTP_Request.Put(i, DateTime.Now.ToString(), userManager.userLocation.Item1, userManager.userLocation.Item2);
             saved = true;
         }
     }
 
     public (GameObject, String) findCryptid((float, float) userLocation)
     {
-        // iterate over server
-        int i = 0;
-        while(PlayerPrefs.GetFloat("loc" + i + "x", 0f) != 0f)
-        {
-            if(PlayerPrefs.GetFloat("loc" + i + "x") == userLocation.Item1 && PlayerPrefs.GetFloat("loc" + i + "y") == userLocation.Item2)
-            {
-                return (library[PlayerPrefs.GetInt("id" + i)], PlayerPrefs.GetString("init" + i));
-            }
-            i++;
-        }
-
-        return (null,"null");
+        fetchC(userLocation);
+        return (fetchedCryptid);
     }
+
+    private IEnumerator fetchC((float, float) loc)
+    {
+        HTTP_Request.Get(loc.Item1, loc.Item2);
+        yield return new WaitForSeconds(0.5f);
+        fetchedCryptid = (library[HTTP_Request.data.id], HTTP_Request.data.loc);
+    } 
 }
