@@ -25,6 +25,7 @@ public class UserManager : MonoBehaviour
     public cryptidGen cryptidGen;
     public MobileNotifications mobileNotifications;
     public serverRep serverRep;
+    public serverConnection serverConnection;
     public DebugDisplay debugDisplay;
 
     // score functionality
@@ -63,7 +64,8 @@ public class UserManager : MonoBehaviour
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
         // check if there is a cryptid at this location
-        (GameObject, String) serverOut = serverRep.findCryptid(userLocation);
+        //(GameObject, String) serverOut = serverRep.findCryptid(userLocation);
+        (GameObject, String) serverOut = httpRequest.findCryptid(userLocation);
         if (serverOut.Item1 != null)
         {
             DateTime.TryParse(serverOut.Item2, out DateTime cryptidInit);
