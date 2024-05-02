@@ -42,6 +42,7 @@ public class UserManager : MonoBehaviour
 
     private void Start()
     {
+        debugDisplay.addOut(serverConnection.findCryptid((1f,1f)).Item2);
 
         //[3]
         score = PlayerPrefs.GetInt("score", 0);
@@ -64,8 +65,11 @@ public class UserManager : MonoBehaviour
         DateTime.TryParse(PlayerPrefs.GetString("time", "0"), out DateTime then);
 
         // check if there is a cryptid at this location
-        //(GameObject, String) serverOut = serverRep.findCryptid(userLocation);
-        (GameObject, String) serverOut = httpRequest.findCryptid(userLocation);
+        (GameObject, String) serverOut = serverRep.findCryptid(userLocation);
+        //(GameObject, String) serverOut = serverConnection.findCryptid(userLocation);
+
+        debugDisplay.addOut("server out: " + serverOut.Item2);
+
         if (serverOut.Item1 != null)
         {
             DateTime.TryParse(serverOut.Item2, out DateTime cryptidInit);

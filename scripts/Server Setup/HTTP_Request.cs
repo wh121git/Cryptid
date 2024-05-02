@@ -5,21 +5,36 @@ using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using System;
 
 public class HTTP_Request : MonoBehaviour
 {
     public Text output;
+    public DebugDisplay debugDisplay;
 
-    void Start()
+    public CryptidInstance data = null;
+
+    public CryptidInstance Get(float x, float y)
     {
-        //StartCoroutine(test());
-    }
+        IEnumerator getFunc = GetE(x,y);
+        StartCoroutine(getFunc);
+        try
+        {
+            while(getFunc.MoveNext())
+            {
 
-    public CryptidInstance data;
+                if(getFunc.Current is CryptidInstance) 
+                {
+                    return data; 
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            return null;
+        }
 
-    public void Get(float x, float y)
-    {
-        StartCoroutine(GetE(x,y));
+        return null;
     }
 
     private IEnumerator GetE(float x, float y)
@@ -28,16 +43,17 @@ public class HTTP_Request : MonoBehaviour
         wr.downloadHandler = new DownloadHandlerBuffer();
         yield return wr.SendWebRequest();
 
-        UnityEngine.Debug.Log(output.text);
-
         if (wr.result != UnityWebRequest.Result.Success)
         {
             output.text = wr.error;
+            debugDisplay.addOut("Error spit: " + wr.error);
         }
         else
         {
             // Show results as text
             data = JsonUtility.FromJson<CryptidInstance>(wr.downloadHandler.text);
+            debugDisplay.addOut("Correct spit: " + wr.downloadHandler.text);
+            yield return data;
         }
     }
 

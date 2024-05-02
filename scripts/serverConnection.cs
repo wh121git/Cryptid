@@ -62,21 +62,27 @@ public class serverConnection : MonoBehaviour
 
         if (saved == false)
         {
-            HTTP_Request.Put(i, DateTime.Now.ToString(), userManager.userLocation.Item1, userManager.userLocation.Item2);
+            HTTP_Request.Put(userManager.userLocation.Item1, userManager.userLocation.Item2, i);
             saved = true;
         }
     }
 
     public (GameObject, String) findCryptid((float, float) userLocation)
     {
-        fetchC(userLocation);
+        StartCoroutine(fetchC(userLocation));
         return (fetchedCryptid);
     }
 
     private IEnumerator fetchC((float, float) loc)
     {
-        HTTP_Request.Get(loc.Item1, loc.Item2);
-        yield return new WaitForSeconds(0.5f);
-        fetchedCryptid = (library[HTTP_Request.data.id], HTTP_Request.data.loc);
+        HTTP_Request.CryptidInstance response = HTTP_Request.Get(loc.Item1, loc.Item2);
+
+        while(response == null)
+        {
+            //debugDisplay.addOut("spin");
+            yield return new WaitForSeconds(0.5f);            
+        }
+
+        fetchedCryptid = (library[response.id], response.init);
     } 
 }
