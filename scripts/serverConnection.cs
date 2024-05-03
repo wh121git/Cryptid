@@ -54,7 +54,7 @@ public class serverConnection : MonoBehaviour
         }
 
         // upgrade Cryptid
-        if(HTTP_Request.Get(userManager.userLocation.Item1, userManager.userLocation.Item2) != null)
+        if(HTTP_Request.data != null)
         {
             HTTP_Request.Put(userManager.userLocation.Item1, userManager.userLocation.Item2, i);
             saved = true;
@@ -75,14 +75,13 @@ public class serverConnection : MonoBehaviour
 
     private IEnumerator fetchC((float, float) loc)
     {
-        HTTP_Request.CryptidInstance response = HTTP_Request.Get(loc.Item1, loc.Item2);
+        HTTP_Request.Get(loc.Item1, loc.Item2);
 
-        while(response == null)
+        while(HTTP_Request.data == null)
         {
-            //debugDisplay.addOut("spin");
             yield return new WaitForSeconds(0.5f);            
         }
 
-        fetchedCryptid = (library[response.id], response.init);
+        fetchedCryptid = (library[HTTP_Request.data.id], HTTP_Request.data.init);
     } 
 }

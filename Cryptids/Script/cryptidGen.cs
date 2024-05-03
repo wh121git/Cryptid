@@ -20,6 +20,7 @@ public class cryptidGen : MonoBehaviour
     public DebugDisplay debugDisplay;
     public UserManager UserManager;
     public serverRep serverRep;
+    public serverConnection serverConnection;
     public ARPlaneManager planeManager;
 
     // public editables
@@ -142,6 +143,11 @@ public class cryptidGen : MonoBehaviour
         exists = true;
 
         serverRep.addToBuffer(cryptid.name);
+
+        // prototype server connection
+        // serverConnection.addToBuffer(cryptid.name)
+
+
         debugDisplay.addOut("Default Cryptid Created");
     }
 
@@ -193,6 +199,9 @@ public class cryptidGen : MonoBehaviour
         exists = true;
 
         serverRep.addToBuffer(cryptid.name);
+        
+        // serverConnection.addToBuffer(cryptid.name)
+         
         debugDisplay.addOut("Summon Crytpid from name");
     }
 
@@ -233,6 +242,9 @@ public class cryptidGen : MonoBehaviour
         }
 
         serverRep.addToBuffer(cryptid.name);
+
+        // serverConnection.addToBuffer(cryptid.name);
+
         exists = true;
 
     }

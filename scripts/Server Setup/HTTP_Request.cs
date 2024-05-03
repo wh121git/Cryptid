@@ -14,31 +14,15 @@ public class HTTP_Request : MonoBehaviour
 
     public CryptidInstance data = null;
 
-    public CryptidInstance Get(float x, float y)
+    public void Get(float x, float y)
     {
         IEnumerator getFunc = GetE(x,y);
         StartCoroutine(getFunc);
-        try
-        {
-            while(getFunc.MoveNext())
-            {
-
-                if(getFunc.Current is CryptidInstance) 
-                {
-                    return data; 
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            return null;
-        }
-
-        return null;
     }
 
     private IEnumerator GetE(float x, float y)
     {
+
         UnityWebRequest wr = new UnityWebRequest("https://localhost:7078/Instance?x=" + x + "&y=" + y);
         wr.downloadHandler = new DownloadHandlerBuffer();
         yield return wr.SendWebRequest();
@@ -53,7 +37,6 @@ public class HTTP_Request : MonoBehaviour
             // Show results as text
             data = JsonUtility.FromJson<CryptidInstance>(wr.downloadHandler.text);
             debugDisplay.addOut("Correct spit: " + wr.downloadHandler.text);
-            yield return data;
         }
     }
 
