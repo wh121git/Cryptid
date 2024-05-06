@@ -554,6 +554,7 @@ MonoBehaviour:
   debugDisplay: {fileID: 1196014794}
   UserManager: {fileID: 144124243}
   serverRep: {fileID: 2046268693}
+  serverConnection: {fileID: 0}
   planeManager: {fileID: 223974229}
   randomChance: 40
   BL: {fileID: 799233785}
@@ -562,7 +563,6 @@ MonoBehaviour:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 9403ec37253316f4bba423fb9cfa96ed, type: 3}
   - {fileID: 867760034644781879, guid: e6e6b5e8498d22544ad093f701f5482a, type: 3}
-  - {fileID: 7499257698806027525, guid: deb9152c03bb91e44b63143e1b571414, type: 3}
   upgradeKey:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 545827525262dfb409cd4c8d3b70357d, type: 3}
@@ -989,7 +989,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1196014792}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
@@ -1907,7 +1907,6 @@ MonoBehaviour:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 9403ec37253316f4bba423fb9cfa96ed, type: 3}
   - {fileID: 867760034644781879, guid: e6e6b5e8498d22544ad093f701f5482a, type: 3}
-  - {fileID: 7499257698806027525, guid: deb9152c03bb91e44b63143e1b571414, type: 3}
   - {fileID: 867760034644781879, guid: 545827525262dfb409cd4c8d3b70357d, type: 3}
   - {fileID: 867760034644781879, guid: 6b78d5497d8b61d4da6f18be4fc1c6f3, type: 3}
   cryptidBuffer: 0
@@ -1959,7 +1958,6 @@ MonoBehaviour:
   - {fileID: 867760034644781879, guid: 0791c0a140bb2444b86302d201c906d2, type: 3}
   - {fileID: 867760034644781879, guid: 9403ec37253316f4bba423fb9cfa96ed, type: 3}
   - {fileID: 867760034644781879, guid: e6e6b5e8498d22544ad093f701f5482a, type: 3}
-  - {fileID: 7499257698806027525, guid: deb9152c03bb91e44b63143e1b571414, type: 3}
   - {fileID: 867760034644781879, guid: 545827525262dfb409cd4c8d3b70357d, type: 3}
   - {fileID: 867760034644781879, guid: 6b78d5497d8b61d4da6f18be4fc1c6f3, type: 3}
   cryptidBuffer: 0

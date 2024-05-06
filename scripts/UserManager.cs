@@ -80,7 +80,7 @@ public class UserManager : MonoBehaviour
         // otherwise randomly generate after an hour
         else
         {
-            if (then.AddSeconds(1) < now)
+            if (then.AddHours(1) < now)
             {
                 cryptidGen.createCryptid();
             }
